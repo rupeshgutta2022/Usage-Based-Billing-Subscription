@@ -1,0 +1,134 @@
+{
+  "plans": [
+    {
+      "id": "free",
+      "name": "Free",
+      "description": "Perfect for side projects and testing",
+      "priceMonthly": 0,
+      "priceAnnual": 0,
+      "currency": "USD",
+      "features": ["1,000 API calls / month", "1 GB storage", "1 seat", "Community support"],
+      "limits": {
+        "apiCalls": 1000,
+        "storageGB": 1,
+        "seats": 1,
+        "computeHours": 10
+      },
+      "overage": {
+        "apiCalls": 0.002,
+        "storageGB": 0.5,
+        "seats": 5,
+        "computeHours": 0.1
+      },
+      "popular": false
+    },
+    {
+      "id": "starter",
+      "name": "Starter",
+      "description": "For growing teams and early startups",
+      "priceMonthly": 29,
+      "priceAnnual": 290,
+      "currency": "USD",
+      "features": ["50,000 API calls / month", "20 GB storage", "5 seats", "Email support", "Basic analytics"],
+      "limits": {
+        "apiCalls": 50000,
+        "storageGB": 20,
+        "seats": 5,
+        "computeHours": 100
+      },
+      "overage": {
+        "apiCalls": 0.0015,
+        "storageGB": 0.3,
+        "seats": 4,
+        "computeHours": 0.08
+      },
+      "popular": true
+    },
+    {
+      "id": "pro",
+      "name": "Pro",
+      "description": "For scaling products and high-volume usage",
+      "priceMonthly": 99,
+      "priceAnnual": 990,
+      "currency": "USD",
+      "features": ["500,000 API calls / month", "100 GB storage", "20 seats", "Priority support", "Advanced analytics", "Webhooks"],
+      "limits": {
+        "apiCalls": 500000,
+        "storageGB": 100,
+        "seats": 20,
+        "computeHours": 500
+      },
+      "overage": {
+        "apiCalls": 0.001,
+        "storageGB": 0.2,
+        "seats": 3,
+        "computeHours": 0.05
+      },
+      "popular": false
+    },
+    {
+      "id": "enterprise",
+      "name": "Enterprise",
+      "description": "Custom limits, SLA, dedicated support",
+      "priceMonthly": null,
+      "priceAnnual": null,
+      "currency": "USD",
+      "features": ["Unlimited API calls", "Unlimited storage", "Unlimited seats", "Dedicated CSM", "Custom SLA", "SSO / SAML", "On-prem option"],
+      "limits": {
+        "apiCalls": null,
+        "storageGB": null,
+        "seats": null,
+        "computeHours": null
+      },
+      "overage": {
+        "apiCalls": 0,
+        "storageGB": 0,
+        "seats": 0,
+        "computeHours": 0
+      },
+      "popular": false
+    }
+  ],
+  "customers": [
+    {
+      "id": "cust_demo",
+      "email": "demo@acme.com",
+      "name": "Acme Corp",
+      "planId": "starter",
+      "billingCycle": "monthly",
+      "status": "active",
+      "createdAt": "2026-01-15T10:00:00.000Z",
+      "currentPeriodStart": "2026-08-01T00:00:00.000Z",
+      "currentPeriodEnd": "2026-09-01T00:00:00.000Z"
+    }
+  ],
+  "usage": [
+    {
+      "customerId": "cust_demo",
+      "period": "2026-08",
+      "apiCalls": 12450,
+      "storageGB": 8.4,
+      "seats": 3,
+      "computeHours": 42.5
+    }
+  ],
+  "invoices": [
+    {
+      "id": "inv_001",
+      "customerId": "cust_demo",
+      "period": "2026-07",
+      "subtotal": 29,
+      "overage": 0,
+      "tax": 0,
+      "total": 29,
+      "status": "paid",
+      "issuedAt": "2026-08-01T00:00:00.000Z",
+      "paidAt": "2026-08-01T02:15:00.000Z",
+      "lineItems": [
+        { "description": "Starter plan (monthly)", "amount": 29 },
+        { "description": "Overage", "amount": 0 }
+      ]
+    }
+  ],
+  "events": []
+}
