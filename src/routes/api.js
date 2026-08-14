@@ -1,0 +1,18 @@
+const express=require('express');const {read,write}=require('../lib/store');const {record,currentPeriod}=require('../services/metering');const {invoiceFor}=require('../services/billing');const router=express.Router();
+const customer=()=>read().customers[0]; const planOf=(db,c)=>db.plans.find(p=>p.id===c.planId);
+router.get('/health',(req,res)=>res.json({ok:true,time:new Date().toISOString()}));
+router.get('/plans',(req,res)=>res.json(read().plans));
+router.get('/plans/:id',(req,res)=>{const p=read().plans.find(x=>x.id===req.params.id);if(!p)return res.status(404).json({error:'Plan not found'});res.json(p);});
+router.get('/customers/me',(req,res)=>{const db=read(),c=db.customers[0],p=planOf(db,c),u=db.usage.find(x=>x.customerId===c.id&&x.period===currentPeriod())||{};res.json({customer:c,plan:p,usage:u});});
+router.put('/customers/me',(req,res)=>{const db=read(),c=db.customers[0];for(const k of ['name','email','metadata'])if(req.body[k]!==undefined)c[k]=req.body[k];write(db);res.json(c);});
+router.post('/subscriptions',(req,res)=>{const db=read(),c=db.customers[0],p=db.plans.find(x=>x.id===req.body.planId),cycle=req.body.billingCycle||'monthly';if(!p)return res.status(400).json({error:'Invalid plan'});if(!['monthly','annual'].includes(cycle))return res.status(400).json({error:'Invalid billing cycle'});c.planId=p.id;c.billingCycle=cycle;c.status='active';c.updatedAt=new Date().toISOString();write(db);res.json({customer:c,plan:p});});
+router.post('/subscriptions/cancel',(req,res)=>{const db=read(),c=db.customers[0];c.status='canceled';c.canceledAt=new Date().toISOString();write(db);res.json(c);});
+router.get('/usage',(req,res)=>{const db=read(),c=db.customers[0],p=planOf(db,c),u=db.usage.find(x=>x.customerId===c.id&&x.period===currentPeriod())||{};res.json({usage:u,limits:p.limits,overage:invoiceFor(c,p,u).overage});});
+router.post('/usage',(req,res)=>{try{const u=record(customer().id,req.body.metric,req.body.quantity,req.body.metadata);res.status(201).json({usage:u});}catch(e){res.status(e.status||400).json({error:e.message,code:e.code});}});
+router.get('/usage/history',(req,res)=>{const c=customer();res.json(read().usage.filter(x=>x.customerId===c.id).sort((a,b)=>b.period.localeCompare(a.period)));});
+router.get('/invoices',(req,res)=>{const c=customer();res.json(read().invoices.filter(x=>x.customerId===c.id).sort((a,b)=>b.issuedAt.localeCompare(a.issuedAt)));});
+router.get('/invoices/:id',(req,res)=>{const x=read().invoices.find(i=>i.id===req.params.id);if(!x)return res.status(404).json({error:'Invoice not found'});res.json(x);});
+router.post('/invoices/preview',(req,res)=>{const db=read(),c=db.customers[0],p=planOf(db,c),u=db.usage.find(x=>x.customerId===c.id&&x.period===currentPeriod())||{};res.json({period:currentPeriod(),plan:p.name,currency:p.currency, ...invoiceFor(c,p,u),usage:u});});
+router.get('/dashboard',(req,res)=>{const db=read(),c=db.customers[0],p=planOf(db,c),u=db.usage.find(x=>x.customerId===c.id&&x.period===currentPeriod())||{};res.json({mrr:p.priceMonthly||0,plan:p.name,status:c.status,usage:u,limits:p.limits,invoiceCount:db.invoices.filter(i=>i.customerId===c.id).length});});
+router.post('/admin/invoices/generate',(req,res)=>{const db=read(),c=db.customers[0],p=planOf(db,c),u=db.usage.find(x=>x.customerId===c.id&&x.period===currentPeriod())||{},calc=invoiceFor(c,p,u);const inv={id:`inv_${Date.now()}`,customerId:c.id,period:currentPeriod(),...calc,status:'open',issuedAt:new Date().toISOString()};db.invoices.push(inv);write(db);res.status(201).json(inv);});
+module.exports=router;
