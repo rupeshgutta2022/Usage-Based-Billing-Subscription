@@ -1,0 +1,4 @@
+const {read,write}=require('../lib/store'); const {AppError}=require('../lib/errors'); const {METRICS}=require('../config/constants');
+function currentPeriod(){const d=new Date();return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}`;}
+function record(customerId,metric,quantity,metadata={}){if(!METRICS.includes(metric))throw new AppError('Invalid metric',400,'INVALID_METRIC');const q=Number(quantity);if(!Number.isFinite(q)||q<0)throw new AppError('Quantity must be a non-negative number');const db=read();let u=db.usage.find(x=>x.customerId===customerId&&x.period===currentPeriod());if(!u){u={customerId,period:currentPeriod()};for(const m of METRICS)u[m]=0;db.usage.push(u);}u[metric]=(Number(u[metric])||0)+q;db.events.push({id:`evt_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,customerId,metric,quantity:q,metadata,timestamp:new Date().toISOString()});write(db);return u;}
+module.exports={record,currentPeriod};
