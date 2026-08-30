@@ -1,0 +1,26 @@
+{
+  "name": "usage-billing-100k-expanded",
+  "version": "2.0.0",
+  "description": "Expanded usage-based billing and subscription platform",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "jest",
+    "lint": "node --check src/index.js",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "uuid": "^10.0.0",
+    "body-parser": "^1.20.3"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true,
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
